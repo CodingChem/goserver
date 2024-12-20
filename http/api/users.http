@@ -1,0 +1,8 @@
+### CreateUser
+
+POST localhost:8080/api/users
+Content-Type: application/json
+
+{
+    "email": "user@example.com"
+}

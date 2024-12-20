@@ -27,7 +27,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error connecting to db: %s", err)
 	}
-	conf := apiConfig{fileserverHits: atomic.Int32{}, db: database.New(db)}
+	conf := apiConfig{fileserverHits: atomic.Int32{}, db: database.New(db), platform: os.Getenv("PLATFORM")}
 
 	mux := http.NewServeMux()
 	mux.Handle(
@@ -40,6 +40,7 @@ func main() {
 	mux.HandleFunc("POST /api/validate_chirp", chirpValidator)
 	mux.HandleFunc("GET /admin/metrics", conf.getFileServerHits)
 	mux.HandleFunc("POST /admin/reset", conf.resetServerHits)
+	mux.HandleFunc("POST /api/users", conf.handleCreateUser)
 	server := http.Server{Addr: ":8080", Handler: mux}
 	fmt.Printf("Starting server...")
 	server.ListenAndServe()
