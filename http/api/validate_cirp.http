@@ -1,0 +1,36 @@
+### Valid chirp
+POST /api/validate_chirp
+HOST: localhost:8080
+Content-Type: application/json
+
+{
+    "body": "This is an opinion I need to share with the world!"
+}
+
+
+### Invalid chirp
+POST /api/validate_chirp
+HOST: localhost:8080
+Content-Type: application/json
+
+{
+    "body": "This is an opinion I need to share with the world and it is way too long! Indeed i am using a lot of characters in these two sentances! and still it was not enough so i am still writing. This really should be enough!"
+}
+
+### Invalid json type
+POST /api/validate_chirp
+HOST: localhost:8080
+Content-Type: application/json
+
+{
+    "notBody": "This wont get parsed right?"
+}
+
+### Dirty word
+POST /api/validate_chirp
+HOST: localhost:8080
+Content-Type: application/json
+
+{
+    "body": "Explicite incomming: kerfuffle , sharBert , fornax"
+}

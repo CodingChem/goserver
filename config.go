@@ -17,14 +17,14 @@ func (cfg *apiConfig) middlewareMetricsInc(next http.Handler) http.Handler {
 	})
 }
 
-func (cfg *apiConfig) getFileServerHits(rw http.ResponseWriter, req *http.Request) {
-	rw.Header().Set("Content-Type", "text/plain; charset=utf-8")
+func (cfg *apiConfig) getFileServerHits(rw http.ResponseWriter, _ *http.Request) {
+	rw.Header().Set("Content-Type", "text/html; charset=utf-8")
 	rw.WriteHeader(200)
-	hits := fmt.Sprintf("Hits: %d", cfg.fileserverHits.Load())
+	hits := fmt.Sprintf("<html><body><h1>Welcome, Chirpy Admin</h1><p>Chirpy has been visited %d times!</p></body></html>", cfg.fileserverHits.Load())
 	rw.Write([]byte(hits))
 }
 
-func (cfg *apiConfig) resetServerHits(rw http.ResponseWriter, req *http.Request) {
+func (cfg *apiConfig) resetServerHits(rw http.ResponseWriter, _ *http.Request) {
 	rw.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	rw.WriteHeader(200)
 	cfg.fileserverHits.Store(0)

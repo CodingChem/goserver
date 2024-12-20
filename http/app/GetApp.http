@@ -1,0 +1,12 @@
+### Variable
+
+@host = localhost:8080
+
+### Get App
+GET /app/
+HOST: {{host}}
+
+### Get image
+GET /app/assets/logo.png
+HOST: {{host}}
+
