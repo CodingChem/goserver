@@ -1,0 +1,14 @@
+@host=localhost:8080
+### Post chirp
+POST /api/chirps
+HOST: localhost:8080
+Content-Type: application/json
+
+{
+    "body": "hello, world! again! again!",
+    "user_id": "b8645a70-6039-4b35-bf70-2b6f67eeef9f"
+}
+
+### Get chirps
+GET /api/chirps
+HOST: localhost:8080
