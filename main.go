@@ -15,9 +15,9 @@ func main() {
 			http.Dir("."),
 		))),
 	)
-	mux.HandleFunc("GET /healthz", healtWriter)
-	mux.HandleFunc("GET /metrics", conf.getFileServerHits)
-	mux.HandleFunc("POST /reset", conf.resetServerHits)
+	mux.HandleFunc("GET /api/healthz", healtWriter)
+	mux.HandleFunc("GET /api/metrics", conf.getFileServerHits)
+	mux.HandleFunc("POST /api/reset", conf.resetServerHits)
 	server := http.Server{Addr: ":8080", Handler: mux}
 	fmt.Printf("Starting server...")
 	server.ListenAndServe()
