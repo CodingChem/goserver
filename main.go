@@ -1,14 +1,19 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
-	_ "github.com/lib/pq"
 	"log"
 	"net/http"
+	"os"
 	"slices"
 	"strings"
 	"sync/atomic"
+
+	"github.com/codingchem/goserver/internal/database"
+	"github.com/joho/godotenv"
+	_ "github.com/lib/pq"
 )
 
 type responseError struct {
@@ -16,8 +21,15 @@ type responseError struct {
 }
 
 func main() {
+	godotenv.Load()
+	dbURL := os.Getenv("DB_URL")
+	db, err := sql.Open("postgres", dbURL)
+	if err != nil {
+		log.Fatalf("Error connecting to db: %s", err)
+	}
+	conf := apiConfig{fileserverHits: atomic.Int32{}, db: database.New(db)}
+
 	mux := http.NewServeMux()
-	conf := apiConfig{fileserverHits: atomic.Int32{}}
 	mux.Handle(
 		"/app/",
 		conf.middlewareMetricsInc(http.StripPrefix("/app", http.FileServer(

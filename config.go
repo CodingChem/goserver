@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"net/http"
 	"sync/atomic"
+
+	"github.com/codingchem/goserver/internal/database"
 )
 
 type apiConfig struct {
 	fileserverHits atomic.Int32
+	db             *database.Queries
 }
 
 func (cfg *apiConfig) middlewareMetricsInc(next http.Handler) http.Handler {
@@ -28,4 +31,10 @@ func (cfg *apiConfig) resetServerHits(rw http.ResponseWriter, _ *http.Request) {
 	rw.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	rw.WriteHeader(200)
 	cfg.fileserverHits.Store(0)
+}
+
+func NewApiConfig(db *database.Queries) apiConfig {
+	return apiConfig{
+		db: db,
+	}
 }
