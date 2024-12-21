@@ -123,7 +123,6 @@ func (cfg *apiConfig) handleCreateChirp(rw http.ResponseWriter, req *http.Reques
 }
 
 func (cfg *apiConfig) handleGetChirps(rw http.ResponseWriter, req *http.Request) {
-	//TODO:
 	chirps, err := cfg.db.GetChirps(req.Context())
 	if err != nil {
 		log.Printf("Error getting chirps from db: %s", err)
@@ -141,5 +140,36 @@ func (cfg *apiConfig) handleGetChirps(rw http.ResponseWriter, req *http.Request)
 		res = append(res, Chirp{ID: el.ID, CreatedAt: el.CreatedAt, UpdatedAt: el.UpdatedAt, Body: el.Body, UserID: el.UserID})
 	}
 	respondWithJSON(rw, 200, res)
+	return
+}
+
+func (cfg *apiConfig) handleGetChirp(rw http.ResponseWriter, req *http.Request) {
+	idParam, err := uuid.Parse(req.PathValue("chirpID"))
+	if err != nil {
+		log.Printf("Error parsing id from path: %s", err)
+		respondWithError(rw, 500, "Something went wrong")
+		return
+	}
+	chirp, err := cfg.db.GetChirp(req.Context(), idParam)
+	if err != nil {
+		log.Printf("Error gettign chirp from db: %s", err)
+		respondWithError(rw, 404, "Chirp not found")
+		return
+	}
+	type jsonChirp struct {
+		ID        uuid.UUID `json:"id"`
+		CreatedAt time.Time `json:"created_at"`
+		UpdatedAt time.Time `json:"updated_at"`
+		Body      string    `json:"body"`
+		UserID    uuid.UUID `json:"user_id"`
+	}
+	payload := jsonChirp{
+		ID:        chirp.ID,
+		CreatedAt: chirp.CreatedAt,
+		UpdatedAt: chirp.UpdatedAt,
+		Body:      chirp.Body,
+		UserID:    chirp.UserID,
+	}
+	respondWithJSON(rw, 200, payload)
 	return
 }

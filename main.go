@@ -43,6 +43,7 @@ func main() {
 	mux.HandleFunc("POST /api/users", conf.handleCreateUser)
 	mux.HandleFunc("POST /api/chirps", conf.handleCreateChirp)
 	mux.HandleFunc("GET /api/chirps", conf.handleGetChirps)
+	mux.HandleFunc("GET /api/chirps/{chirpID}", conf.handleGetChirp)
 	server := http.Server{Addr: ":8080", Handler: mux}
 	fmt.Printf("Starting server...")
 	server.ListenAndServe()

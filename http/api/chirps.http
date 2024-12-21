@@ -5,10 +5,14 @@ HOST: localhost:8080
 Content-Type: application/json
 
 {
-    "body": "hello, world! again! again!",
-    "user_id": "b8645a70-6039-4b35-bf70-2b6f67eeef9f"
+    "body": "whupdidu",
+    "user_id": "49603d85-ca5a-4fad-bce8-6e46047deeb2"
 }
 
 ### Get chirps
 GET /api/chirps
+HOST: localhost:8080
+
+### Get chirp
+GET /api/chirps/07be237d-63bb-4ac6-844c-124b411ca700
 HOST: localhost:8080
