@@ -8,6 +8,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/codingchem/goserver/internal/auth"
 	"github.com/codingchem/goserver/internal/database"
 	"github.com/google/uuid"
 )
@@ -53,7 +54,8 @@ func NewApiConfig(db *database.Queries, platform string) apiConfig {
 
 func (cfg *apiConfig) handleCreateUser(rw http.ResponseWriter, req *http.Request) {
 	type reqStruct struct {
-		Email string `json:"email"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
 	}
 	var reqData reqStruct
 	decoder := json.NewDecoder(req.Body)
@@ -62,7 +64,13 @@ func (cfg *apiConfig) handleCreateUser(rw http.ResponseWriter, req *http.Request
 		respondWithError(rw, 500, "Something went wrong")
 		return
 	}
-	user, err := cfg.db.CreateUser(req.Context(), reqData.Email)
+	pass_hash, err := auth.HashPassword(reqData.Password)
+	if err != nil {
+		log.Printf("Error hashing password: %s", err)
+		respondWithError(rw, 500, "Something went wrong")
+		return
+	}
+	user, err := cfg.db.CreateUser(req.Context(), database.CreateUserParams{Email: reqData.Email, HashedPassword: pass_hash})
 	if err != nil {
 		log.Printf("Error executing sql: %s", err)
 		respondWithError(rw, 500, "Something went wrong")
@@ -172,4 +180,40 @@ func (cfg *apiConfig) handleGetChirp(rw http.ResponseWriter, req *http.Request) 
 	}
 	respondWithJSON(rw, 200, payload)
 	return
+}
+
+func (cfg *apiConfig) handleLogin(rw http.ResponseWriter, req *http.Request) {
+	type paramStruct struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+	var param paramStruct
+	decoder := json.NewDecoder(req.Body)
+	if err := decoder.Decode(&param); err != nil {
+		log.Printf("Error decoding params in login: %s", err)
+		respondWithError(rw, 500, "something went wrong")
+		return
+	}
+	user, err := cfg.db.GetUserByEmail(req.Context(), param.Email)
+	if err != nil {
+		respondWithError(rw, 401, "Incorrect email or password")
+		return
+	}
+	if err = auth.ChechPasswordHash(param.Password, user.HashedPassword); err != nil {
+		respondWithError(rw, 401, "Incorrect email or password")
+		return
+	}
+	type returnStruct struct {
+		ID        uuid.UUID `json:"id"`
+		CreatedAt time.Time `json:"created_at"`
+		UpdatedAt time.Time `json:"updated_at"`
+		Email     string    `json:"email"`
+	}
+	response := returnStruct{
+		ID:        user.ID,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+		Email:     user.Email,
+	}
+	respondWithJSON(rw, 200, response)
 }
