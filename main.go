@@ -23,6 +23,7 @@ type responseError struct {
 func main() {
 	godotenv.Load()
 	dbURL := os.Getenv("DB_URL")
+	port := os.Getenv("PORT")
 	db, err := sql.Open("postgres", dbURL)
 	if err != nil {
 		log.Fatalf("Error connecting to db: %s", err)
@@ -44,8 +45,8 @@ func main() {
 	mux.HandleFunc("POST /api/chirps", conf.handleCreateChirp)
 	mux.HandleFunc("GET /api/chirps", conf.handleGetChirps)
 	mux.HandleFunc("GET /api/chirps/{chirpID}", conf.handleGetChirp)
-	server := http.Server{Addr: ":8080", Handler: mux}
-	fmt.Printf("Starting server...")
+	server := http.Server{Addr: fmt.Sprintf(":%s", port), Handler: mux}
+	fmt.Printf("Starting server on port: %s...", port)
 	server.ListenAndServe()
 }
 
